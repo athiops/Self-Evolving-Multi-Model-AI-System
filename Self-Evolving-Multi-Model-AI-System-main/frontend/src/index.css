@@ -1,0 +1,215 @@
+@import url('https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@300;400;600;800&family=JetBrains+Mono:wght@300;400;500;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+    :root {
+        --background: 0 0% 2%;
+        --foreground: 180 10% 90%;
+        --card: 0 0% 3%;
+        --card-foreground: 180 10% 90%;
+        --popover: 0 0% 3%;
+        --popover-foreground: 180 10% 90%;
+        --primary: 184 100% 50%;
+        --primary-foreground: 0 0% 0%;
+        --secondary: 266 100% 60%;
+        --secondary-foreground: 0 0% 100%;
+        --muted: 180 5% 10%;
+        --muted-foreground: 180 5% 60%;
+        --accent: 184 100% 50%;
+        --accent-foreground: 0 0% 0%;
+        --destructive: 346 100% 50%;
+        --destructive-foreground: 0 0% 100%;
+        --border: 180 5% 15%;
+        --input: 180 5% 15%;
+        --ring: 184 100% 50%;
+        --chart-1: 184 100% 50%;
+        --chart-2: 266 100% 60%;
+        --chart-3: 346 100% 50%;
+        --chart-4: 45 100% 50%;
+        --chart-5: 120 100% 50%;
+        --radius: 0.25rem;
+    }
+}
+
+@layer base {
+    * {
+        @apply border-border;
+    }
+    
+    body {
+        @apply bg-background text-foreground;
+        font-family: 'JetBrains Mono', monospace;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+        font-family: 'Azeret Mono', monospace;
+    }
+}
+
+/* Scanline overlay effect */
+.scanlines {
+    position: relative;
+}
+
+.scanlines::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 2px,
+        rgba(0, 0, 0, 0.1) 2px,
+        rgba(0, 0, 0, 0.1) 4px
+    );
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Glowing effects */
+.glow-cyan {
+    box-shadow: 0 0 10px rgba(0, 240, 255, 0.3),
+                0 0 20px rgba(0, 240, 255, 0.2),
+                0 0 30px rgba(0, 240, 255, 0.1);
+}
+
+.glow-red {
+    box-shadow: 0 0 10px rgba(255, 0, 80, 0.3),
+                0 0 20px rgba(255, 0, 80, 0.2),
+                0 0 30px rgba(255, 0, 80, 0.1);
+}
+
+.glow-green {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3),
+                0 0 20px rgba(16, 185, 129, 0.2),
+                0 0 30px rgba(16, 185, 129, 0.1);
+}
+
+.glow-yellow {
+    box-shadow: 0 0 10px rgba(255, 200, 0, 0.3),
+                0 0 20px rgba(255, 200, 0, 0.2),
+                0 0 30px rgba(255, 200, 0, 0.1);
+}
+
+/* Glass morphism panel */
+.glass-panel {
+    background: rgba(3, 3, 3, 0.5);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Corner brackets decoration */
+.corner-brackets {
+    position: relative;
+}
+
+.corner-brackets::before,
+.corner-brackets::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 2px solid hsl(var(--primary));
+}
+
+.corner-brackets::before {
+    top: -1px;
+    left: -1px;
+    border-right: none;
+    border-bottom: none;
+}
+
+.corner-brackets::after {
+    bottom: -1px;
+    right: -1px;
+    border-left: none;
+    border-top: none;
+}
+
+/* Pulse animation for status indicators */
+@keyframes pulse-glow {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: hsl(var(--muted));
+}
+
+::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.5);
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.7);
+}
+
+/* Chart tooltip styling */
+.recharts-tooltip-wrapper {
+    outline: none !important;
+}
+
+.custom-tooltip {
+    background: rgba(0, 0, 0, 0.9) !important;
+    border: 1px solid hsl(var(--primary) / 0.3) !important;
+    padding: 8px 12px !important;
+    font-family: 'JetBrains Mono', monospace !important;
+    font-size: 12px !important;
+}
+
+/* Data debug wrapper */
+@layer base {
+    [data-debug-wrapper="true"] {
+        display: contents !important;
+    }
+
+    [data-debug-wrapper="true"] > * {
+        margin-left: inherit;
+        margin-right: inherit;
+        margin-top: inherit;
+        margin-bottom: inherit;
+        padding-left: inherit;
+        padding-right: inherit;
+        padding-top: inherit;
+        padding-bottom: inherit;
+        column-gap: inherit;
+        row-gap: inherit;
+        gap: inherit;
+        border-left-width: inherit;
+        border-right-width: inherit;
+        border-top-width: inherit;
+        border-bottom-width: inherit;
+        border-left-style: inherit;
+        border-right-style: inherit;
+        border-top-style: inherit;
+        border-bottom-style: inherit;
+        border-left-color: inherit;
+        border-right-color: inherit;
+        border-top-color: inherit;
+        border-bottom-color: inherit;
+    }
+}
