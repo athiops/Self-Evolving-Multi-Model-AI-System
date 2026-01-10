@@ -532,6 +532,19 @@ export default function Dashboard() {
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
+            {/* Home Link */}
+            <Link to="/">
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-mono text-xs tracking-wider border-white/20 hover:border-cyan-500/50"
+                data-testid="home-btn"
+              >
+                <Home className="w-4 h-4 mr-2" />
+                HOME
+              </Button>
+            </Link>
+
             {/* JARVIS-X Link */}
             <Link to="/jarvis-x">
               <Button
