@@ -391,16 +391,17 @@ export default function JarvisXPage() {
       <header className="mb-6">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex items-center gap-4">
-            {/* Back to Dashboard Button */}
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={handleNavigateToDashboard}
-              className="h-10 w-10 rounded-full border-primary/30 hover:bg-primary/10"
-              data-testid="back-to-dashboard-btn"
-            >
-              <ArrowLeft className="w-5 h-5" />
-            </Button>
+            {/* Home Button */}
+            <Link to="/">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-10 w-10 rounded-full border-primary/30 hover:bg-primary/10"
+                data-testid="home-btn"
+              >
+                <Home className="w-5 h-5" />
+              </Button>
+            </Link>
             
             <div className="relative">
               <div className={`w-12 h-12 rounded-full bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center ${isSpeaking ? 'animate-pulse' : ''}`}>
@@ -419,6 +420,19 @@ export default function JarvisXPage() {
           </div>
 
           <div className="flex items-center gap-3 flex-wrap">
+            {/* Dashboard Link */}
+            <Link to="/dashboard">
+              <Button
+                variant="outline"
+                size="sm"
+                className="font-mono text-xs tracking-wider border-white/20 hover:border-cyan-500/50"
+                data-testid="dashboard-link-btn"
+              >
+                <Activity className="w-4 h-4 mr-2" />
+                DASHBOARD
+              </Button>
+            </Link>
+
             {/* Speaker Status */}
             <Badge 
               variant="outline" 
