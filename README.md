@@ -6,17 +6,22 @@ A production-ready AI platform inspired by Tony Stark's JARVIS
 🚀 Launch Dashboard • 📖 Documentation • 🌍 Real-World Use Cases • 🎯 Features
 
 📋 Table of Contents
-Overview
-Quick Start
-System Architecture
-6 Core AI Models
-JARVIS-X Voice Assistant
-Real-World Applications
-How It Works
-API Documentation
-Technology Stack
-Deployment
-Contributing
+- [Overview](#-overview)
+- [Quick Start](#-quick-start)
+- [System Architecture](#-system-architecture)
+- [6 Core AI Models](#-6-core-ai-models)
+- [JARVIS-X Voice Assistant](#-jarvis-x-voice-assistant)
+- [Real-World Applications](#-real-world-applications)
+- [How It Works](#️-how-it-works)
+- [API Documentation](#-api-documentation)
+- [Technology Stack](#️-technology-stack)
+- [Deployment](#-deployment)
+- [Performance Metrics](#-performance-metrics)
+- [Important Notes](#️-important-notes)
+- [Contributing](#-contributing)
+- [Indian Patent & Intellectual Property](#-indian-patent--intellectual-property)
+- [License](#-license)
+- [Acknowledgments](#-acknowledgments)
 🌟 Overview
 JARVIS-X is a Self-Evolving Multi-Model AI System that combines cutting-edge machine learning techniques to create an intelligent, adaptive, and explainable AI platform. Unlike traditional static ML models, JARVIS-X continuously learns from streaming data, adapts to concept drift, and provides transparent explanations for all decisions.
 
@@ -587,9 +592,10 @@ Documentation: You're reading it!
 Real-World Guide: /app/REAL_WORLD_APPLICATIONS.md
 API Docs: In-code documentation
 Issues: Check backend/frontend logs
-## 📜 Indian Patent & Intellectual Property Notice
 
-JARVIS-X is associated with a published **Indian Patent Application** covering the self-evolving autonomous intelligence system and its underlying concepts, including federated learning, concept drift detection, digital twin simulation, and explainable AI.
+## 📜 Indian Patent & Intellectual Property
+
+JARVIS-X is associated with a **published Indian patent application**. The patent publication identifies the invention as a self-evolving autonomous intelligence system incorporating digital twin, federated learning, and cognitive AI concepts.
 
 ### Patent Details
 
@@ -597,15 +603,15 @@ JARVIS-X is associated with a published **Indian Patent Application** covering t
 |---|---|
 | **Indian Patent Application No.** | `202641048618` |
 | **Publication No.** | `IN202641048618 A1` |
+| **Date of Filing** | `16 April 2026` |
 | **Publication Date** | `12 June 2026` |
-| **Application Filing Date** | `16 April 2026` |
+| **Journal No.** | `24/2026` |
 | **Status** | **Patent Application Published / Patent Pending** |
-| **Publication Title** | *Self evolving autonomous intelligence system with digital twin federated learning & cognitive ai* |
-| **Complete Specification Title** | *JARVIS-X: A Self-Evolving Multi-Model Artificial Intelligence System with Federated Learning, Concept Drift Detection, Digital Twin Simulation, and Explainable AI* |
+| **Published Title** | *Self evolving autonomous intelligence system with digital twin federated learning & cognitive ai* |
 
 ### Applicants / Inventors
 
-The patent publication identifies the following applicants/inventors:
+The patent publication identifies the following applicants and inventors:
 
 1. **Dr. Dhiyanesh**
 2. **Athithya S.A**
@@ -613,25 +619,24 @@ The patent publication identifies the following applicants/inventors:
 4. **Eedpuganti Yagna Sai Harshith**
 5. **J. Princeton Vishal**
 
-> **Patent notice:** The application has been published by the Indian Patent Office. Publication of a patent application does **not** by itself mean that a patent has been granted. The patent status should therefore be represented as **Patent Pending / Patent Application Published** unless and until a grant is officially issued.
+### Patent Notice
 
-### Intellectual Property
+> **Patent Application Published — Patent Pending.**  
+> Publication of an Indian patent application does not by itself mean that a patent has been granted. The status above is therefore intentionally stated as **Patent Application Published / Patent Pending**.
 
-The patent rights and copyright rights are separate forms of intellectual property. This repository may contain software, source code, documentation, algorithms, models, system architecture, and implementation details associated with the research and patent application.
+The patent application and this repository should be treated as separate intellectual-property records. The patent application concerns the invention and its patent claims, while copyright and other rights may apply to the source code, documentation, software architecture, models, and other original materials in this repository.
 
-Unless explicitly permitted by the applicable license or by written authorization from the rights holders, users should not assume that publication of this repository grants permission to commercially exploit, reproduce, redistribute, or create derivative implementations of patent-protected subject matter.
+Nothing in this README should be interpreted as granting a patent license or other intellectual-property rights beyond the permissions expressly provided in the repository's applicable license.
 
-For licensing, research collaboration, commercial use, or other permissions, contact the relevant rights holders.
+For research collaboration, licensing, commercial use, or other permissions, contact the relevant rights holders.
 
 ## 📜 License
 
-This repository is associated with a published Indian patent application and contains research/educational software.
+This repository contains research and educational software associated with a published Indian patent application.
 
-**Unless a separate license file in this repository states otherwise, no broad open-source license is granted merely by publication of this repository.** Patent rights and copyright rights are separate and may apply independently.
+The applicable software-use terms are defined in the repository's `LICENSE` file. **No patent license is granted by this README or by publication of the repository.** Patent rights and copyright rights are separate and may apply independently.
 
-For permission to reuse, redistribute, commercially exploit, or create derivative implementations of protected materials, contact the relevant rights holders.
-
-See the repository's `LICENSE` file for the applicable software-use terms.
+For permissions not expressly granted by the applicable license, including permissions relating to protected intellectual property, contact the relevant rights holders.
 
 🙏 Acknowledgments
 Inspiration: Tony Stark's JARVIS (Iron Man)
