@@ -1,7 +1,10 @@
 🤖 JARVIS-X: Self-Evolving Multi-Model AI System
 JARVIS-X Status Models
 
-A production-ready AI platform inspired by Tony Stark's JARVIS
+A research/demo platform inspired by Tony Stark's JARVIS
+
+> **Implementation status (federated learning):** The five built-in nodes are simulated demo nodes. Their River anomaly detectors are local online-learning models; the 25-element vectors shown in the demo are not extracted from those models and must not be interpreted as trained neural-network weights. The backend now also exposes a validated local-update submission interface and sample-count-weighted FedAvg aggregation for compatible client-produced vectors. That interface does not itself train clients or provide node authentication, authorization, secure aggregation, transport hardening, or production privacy guarantees. Do not use it with sensitive data or describe this repository as a production federated-learning deployment until those controls and an independently verified client trainer are implemented.
+
 
 🚀 Launch Dashboard • 📖 Documentation • 🌍 Real-World Use Cases • 🎯 Features
 
@@ -27,11 +30,11 @@ JARVIS-X is a Self-Evolving Multi-Model AI System that combines cutting-edge mac
 
 What Makes JARVIS-X Revolutionary?
 ✅ Self-Evolving: Learns continuously without manual retraining
-✅ Privacy-First: Federated learning protects sensitive data
+⚠️ Federated Learning: Demo simulation plus an experimental local-update API; not production-secure
 ✅ Explainable: Transparent AI decisions you can trust
 ✅ Voice-Enabled: Tony Stark-style natural language interaction
 ✅ Multi-Domain: Healthcare, Finance, Manufacturing, Education, and more
-✅ Production-Ready: Built for real-world deployment at scale
+⚠️ Research Prototype: Requires security, validation, and deployment hardening before production use
 
 🚀 Quick Start
 Access the System
