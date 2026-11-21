@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, StrictFloat, StrictInt
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone
@@ -420,6 +420,7 @@ class FederatedAggregator:
         self.aggregation_rounds = 0
         self.last_aggregation = None
         self.aggregation_history.clear()
+        self.pending_updates.clear()
         self._initialize_nodes()
 
 # =============================================================================
@@ -608,8 +609,8 @@ class DriftInjectionInput(BaseModel):
 
 class FederatedLocalUpdateInput(BaseModel):
     node_id: str = Field(..., min_length=1, max_length=128)
-    weights: List[float] = Field(..., min_length=25, max_length=25)
-    sample_count: int = Field(..., gt=0)
+    weights: List[StrictFloat] = Field(..., min_length=25, max_length=25)
+    sample_count: StrictInt = Field(..., gt=0)
 
 class ModelStats(BaseModel):
     model_config = ConfigDict(extra="ignore")
