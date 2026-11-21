@@ -1,8 +1,9 @@
-import math
-
 import pytest
 
-from federated_core import validate_update, weighted_fedavg
+try:
+    from federated_core import validate_update, weighted_fedavg
+except ModuleNotFoundError:
+    from backend.federated_core import validate_update, weighted_fedavg
 
 
 def test_weighted_fedavg_uses_client_sample_counts():
