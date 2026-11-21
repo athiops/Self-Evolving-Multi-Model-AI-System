@@ -202,8 +202,9 @@ class FederatedNode:
         # Update drift detector
         drift_status = self.drift_detector.update(score)
         
-        # Update simulated weights based on learning
-        self.weights = [w + float(self.rng.normal(0, 0.01)) for w in self.weights]
+        # Demo-only vector is intentionally not mutated: it is not a parameter
+        # export from River's HalfSpaceTrees model. Real client updates use the
+        # explicit /federated/updates endpoint.
         
         avg_score = float(np.mean(list(self.local_scores))) if self.local_scores else 0
         
