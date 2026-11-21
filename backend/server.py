@@ -6,12 +6,14 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field, ConfigDict
+from pydantic import BaseModel, Field, ConfigDict, StrictFloat, StrictInt
 from typing import List, Optional, Dict, Any
 import uuid
 from datetime import datetime, timezone
 import numpy as np
 from collections import deque
+
+from federated_core import validate_update, weighted_fedavg
 import asyncio
 import json
 import csv
@@ -144,8 +146,9 @@ class ConceptDriftDetector:
 class FederatedNode:
     """Simulated federated learning node with local model and data"""
     
-    def __init__(self, node_id: str, name: str, location: str):
+    def __init__(self, node_id: str, name: str, location: str, seed: int = 0):
         self.node_id = node_id
+        self.rng = np.random.default_rng(seed)
         self.name = name
         self.location = location
         self.created_at = datetime.now(timezone.utc)
@@ -167,19 +170,19 @@ class FederatedNode:
         self.last_update = datetime.now(timezone.utc)
         
         # Model weights (simulated)
-        self.weights = np.random.randn(25).tolist()  # Simulated weight vector
+        self.weights = self.rng.standard_normal(25).tolist()  # Demo-only vector
         
         # Data characteristics
-        self.mean_shift = np.random.uniform(-0.5, 0.5)  # Simulate different data distributions
-        self.variance_scale = np.random.uniform(0.8, 1.2)
+        self.mean_shift = float(self.rng.uniform(-0.5, 0.5))  # Simulate different data distributions
+        self.variance_scale = float(self.rng.uniform(0.8, 1.2))
         
     def generate_local_data(self, inject_drift: bool = False) -> List[float]:
         """Generate data with node-specific characteristics"""
-        base_data = np.random.normal(loc=self.mean_shift, scale=self.variance_scale, size=5)
+        base_data = self.rng.normal(loc=self.mean_shift, scale=self.variance_scale, size=5)
         
         if inject_drift:
             # Shift the distribution significantly
-            drift_shift = np.random.normal(5, 1, size=5)
+            drift_shift = self.rng.normal(5, 1, size=5)
             base_data = base_data + drift_shift
             
         return base_data.tolist()
@@ -199,8 +202,9 @@ class FederatedNode:
         # Update drift detector
         drift_status = self.drift_detector.update(score)
         
-        # Update simulated weights based on learning
-        self.weights = [w + np.random.normal(0, 0.01) for w in self.weights]
+        # Demo-only vector is intentionally not mutated: it is not a parameter
+        # export from River's HalfSpaceTrees model. Real client updates use the
+        # explicit /federated/updates endpoint.
         
         avg_score = float(np.mean(list(self.local_scores))) if self.local_scores else 0
         
@@ -253,7 +257,9 @@ class FederatedNode:
 class FederatedAggregator:
     """Aggregates model updates from federated nodes (FedAvg implementation)"""
     
-    def __init__(self):
+    def __init__(self, seed: int = 42):
+        self.seed = seed
+        self.pending_updates: Dict[str, Dict[str, Any]] = {}
         self.global_weights = None
         self.aggregation_rounds = 0
         self.last_aggregation = None
@@ -273,8 +279,10 @@ class FederatedAggregator:
             ("node_5", "Edge Node Epsilon", "Cloud Region"),
         ]
         
-        for node_id, name, location in node_configs:
-            self.nodes[node_id] = FederatedNode(node_id, name, location)
+        for index, (node_id, name, location) in enumerate(node_configs):
+            self.nodes[node_id] = FederatedNode(
+                node_id, name, location, seed=self.seed + index
+            )
             
         # Initialize global weights as average of node weights
         self._aggregate_weights()
@@ -284,17 +292,12 @@ class FederatedAggregator:
         if not self.nodes:
             return []
             
-        all_weights = [node.get_weights() for node in self.nodes.values()]
-        
-        # Simple averaging (FedAvg)
-        num_nodes = len(all_weights)
-        weight_length = len(all_weights[0])
-        
-        aggregated = []
-        for i in range(weight_length):
-            avg = sum(weights[i] for weights in all_weights) / num_nodes
-            aggregated.append(avg)
-            
+        updates = [
+            {"weights": node.get_weights(), "sample_count": node.data_points_processed or 1}
+            for node in self.nodes.values()
+        ]
+        aggregated = weighted_fedavg(updates, expected_dimension=len(updates[0]["weights"]))
+        num_nodes = len(updates)
         self.global_weights = aggregated
         self.aggregation_rounds += 1
         self.last_aggregation = datetime.now(timezone.utc)
@@ -313,9 +316,47 @@ class FederatedAggregator:
         if self.global_weights:
             for node in self.nodes.values():
                 # Add small noise to simulate local adaptation
-                noisy_weights = [w + np.random.normal(0, 0.001) for w in self.global_weights]
-                node.set_weights(noisy_weights)
+                # Demo distribution copies the global vector without fabricating training noise.
+                node.set_weights(list(self.global_weights))
                 
+    def submit_local_update(self, node_id: str, weights: List[float], sample_count: int) -> Dict[str, Any]:
+        """Accept a validated vector produced by a separately running local trainer."""
+        if node_id not in self.nodes:
+            raise KeyError(f"Unknown federated node: {node_id}")
+        normalized = validate_update(weights, sample_count, expected_dimension=25)
+        self.pending_updates[node_id] = {
+            "weights": normalized,
+            "sample_count": sample_count,
+            "submitted_at": datetime.now(timezone.utc).isoformat(),
+        }
+        return {
+            "node_id": node_id,
+            "sample_count": sample_count,
+            "dimension": len(normalized),
+            "status": "ACCEPTED_PENDING_AGGREGATION",
+        }
+
+    def aggregate_submitted_updates(self) -> List[float]:
+        """Aggregate only explicitly submitted local updates; never mix demo vectors."""
+        if not self.pending_updates:
+            raise ValueError("no submitted local updates are available")
+        aggregated = weighted_fedavg(self.pending_updates.values(), expected_dimension=25)
+        self.global_weights = aggregated
+        self.aggregation_rounds += 1
+        self.last_aggregation = datetime.now(timezone.utc)
+        self.aggregation_history.append({
+            "round": self.aggregation_rounds,
+            "timestamp": self.last_aggregation.isoformat(),
+            "nodes_participated": len(self.pending_updates),
+            "total_samples": sum(x["sample_count"] for x in self.pending_updates.values()),
+            "weight_norm": float(np.linalg.norm(aggregated)),
+            "mode": "submitted_local_updates",
+        })
+        for node_id in self.pending_updates:
+            self.nodes[node_id].set_weights(list(aggregated))
+        self.pending_updates.clear()
+        return aggregated
+
     def process_round(self, inject_drift: bool = False, drift_node_id: Optional[str] = None) -> Dict[str, Any]:
         """Process one federated learning round"""
         results = {}
@@ -361,6 +402,8 @@ class FederatedAggregator:
             global_health = "HEALTHY"
             
         return {
+            "mode": "simulated_demo",
+            "is_production_federated_learning": False,
             "global_health": global_health,
             "total_nodes": len(self.nodes),
             "online_nodes": sum(1 for n in self.nodes.values() if n.status == "ONLINE"),
@@ -378,6 +421,7 @@ class FederatedAggregator:
         self.aggregation_rounds = 0
         self.last_aggregation = None
         self.aggregation_history.clear()
+        self.pending_updates.clear()
         self._initialize_nodes()
 
 # =============================================================================
@@ -563,6 +607,11 @@ class StreamConfigInput(BaseModel):
 class DriftInjectionInput(BaseModel):
     active: bool = Field(..., description="Whether to inject drift")
     node_id: Optional[str] = Field(None, description="Specific node to inject drift (optional)")
+
+class FederatedLocalUpdateInput(BaseModel):
+    node_id: str = Field(..., min_length=1, max_length=128)
+    weights: List[StrictFloat] = Field(..., min_length=25, max_length=25)
+    sample_count: StrictInt = Field(..., gt=0)
 
 class ModelStats(BaseModel):
     model_config = ConfigDict(extra="ignore")
@@ -861,13 +910,30 @@ async def get_node_drift_events(node_id: str, limit: int = 20):
         raise HTTPException(status_code=404, detail=f"Node {node_id} not found")
     return {"events": federated_aggregator.nodes[node_id].drift_detector.get_events(limit)}
 
+@api_router.post("/federated/updates")
+async def submit_federated_update(input_data: FederatedLocalUpdateInput):
+    """Submit a client-trained vector. Authentication/enrollment is required before production use."""
+    try:
+        return federated_aggregator.submit_local_update(
+            input_data.node_id, input_data.weights, input_data.sample_count
+        )
+    except KeyError as exc:
+        raise HTTPException(status_code=404, detail=str(exc))
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc))
+
 @api_router.post("/federated/aggregate")
 async def trigger_aggregation():
-    """Manually trigger weight aggregation"""
-    weights = federated_aggregator._aggregate_weights()
-    federated_aggregator.distribute_global_model()
+    """Aggregate submitted client updates, or clearly labeled demo-node vectors."""
+    if federated_aggregator.pending_updates:
+        weights = federated_aggregator.aggregate_submitted_updates()
+        mode = "submitted_local_updates"
+    else:
+        weights = federated_aggregator._aggregate_weights()
+        mode = "simulated_demo"
     return {
         "message": "Aggregation completed",
+        "mode": mode,
         "round": federated_aggregator.aggregation_rounds,
         "weight_norm": float(np.linalg.norm(weights))
     }
