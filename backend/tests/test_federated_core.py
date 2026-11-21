@@ -65,3 +65,25 @@ def test_weighted_fedavg_rejects_invalid_dimension_even_for_empty_input():
 def test_weighted_fedavg_rejects_non_mapping_update():
     with pytest.raises(ValueError, match="each update must be a mapping"):
         weighted_fedavg([None], expected_dimension=2)
+
+
+def test_weighted_fedavg_avoids_overflow_from_large_sample_counts():
+    result = weighted_fedavg(
+        [
+            {"weights": [1e308], "sample_count": 10**300},
+            {"weights": [1e308], "sample_count": 10**300},
+        ],
+        expected_dimension=1,
+    )
+    assert result == pytest.approx([1e308])
+
+
+def test_weighted_fedavg_returns_finite_convex_average_for_opposite_extremes():
+    result = weighted_fedavg(
+        [
+            {"weights": [1e308], "sample_count": 1},
+            {"weights": [-1e308], "sample_count": 1},
+        ],
+        expected_dimension=1,
+    )
+    assert result == pytest.approx([0.0])
