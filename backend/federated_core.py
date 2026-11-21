@@ -10,12 +10,22 @@ import math
 from typing import Iterable, Mapping, Sequence
 
 
+def _validate_dimension(expected_dimension: int) -> None:
+    if (
+        isinstance(expected_dimension, bool)
+        or not isinstance(expected_dimension, int)
+        or expected_dimension <= 0
+    ):
+        raise ValueError("expected_dimension must be a positive integer")
+
+
 def validate_update(
     weights: Sequence[float],
     sample_count: int,
     expected_dimension: int,
 ) -> list[float]:
     """Return a normalized finite update vector or raise ValueError."""
+    _validate_dimension(expected_dimension)
     if isinstance(sample_count, bool) or not isinstance(sample_count, int) or sample_count <= 0:
         raise ValueError("sample_count must be a positive integer")
     if not isinstance(weights, (list, tuple)) or not weights:
@@ -44,8 +54,11 @@ def weighted_fedavg(
     expected_dimension: int,
 ) -> list[float]:
     """Compute sample-count-weighted FedAvg after validating every update."""
+    _validate_dimension(expected_dimension)
     validated: list[tuple[list[float], int]] = []
     for update in updates:
+        if not isinstance(update, Mapping):
+            raise ValueError("each update must be a mapping")
         weights = update.get("weights")
         sample_count = update.get("sample_count")
         validated.append(
