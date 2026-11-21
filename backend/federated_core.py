@@ -71,7 +71,17 @@ def weighted_fedavg(
         raise ValueError("at least one client update is required")
 
     total_samples = sum(count for _, count in validated)
-    return [
-        sum(vector[index] * count for vector, count in validated) / total_samples
-        for index in range(expected_dimension)
-    ]
+    # Normalize counts before multiplying by model values. Multiplying a
+    # large finite weight by a large sample count can overflow even when the
+    # final weighted mean is representable as a finite float.
+    normalized_counts = [count / total_samples for _, count in validated]
+    result: list[float] = []
+    for index in range(expected_dimension):
+        value = math.fsum(
+            vector[index] * normalized_count
+            for (vector, _), normalized_count in zip(validated, normalized_counts)
+        )
+        if not math.isfinite(value):
+            raise ValueError("aggregated weights must be finite")
+        result.append(value)
+    return result
