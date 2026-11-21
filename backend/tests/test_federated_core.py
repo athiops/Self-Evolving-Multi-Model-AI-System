@@ -49,3 +49,19 @@ def test_weighted_fedavg_rejects_dimension_mismatch():
 
 def test_valid_update_is_normalized_to_floats():
     assert validate_update([1, 2.5], 4, 2) == [1.0, 2.5]
+
+
+@pytest.mark.parametrize("dimension", [0, -1, True, 1.5, "2"])
+def test_invalid_expected_dimension_is_rejected(dimension):
+    with pytest.raises(ValueError, match="expected_dimension"):
+        validate_update([1.0, 2.0], 1, dimension)
+
+
+def test_weighted_fedavg_rejects_invalid_dimension_even_for_empty_input():
+    with pytest.raises(ValueError, match="expected_dimension"):
+        weighted_fedavg([], expected_dimension=0)
+
+
+def test_weighted_fedavg_rejects_non_mapping_update():
+    with pytest.raises(ValueError, match="each update must be a mapping"):
+        weighted_fedavg([None], expected_dimension=2)
