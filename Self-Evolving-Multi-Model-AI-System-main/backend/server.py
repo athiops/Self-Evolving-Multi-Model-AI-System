@@ -21,6 +21,7 @@ import threading
 
 # River for online ML
 from river import anomaly, preprocessing, drift
+from cors_config import parse_cors_origins
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -1844,7 +1845,7 @@ app.include_router(api_router)
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,
-    allow_origins=os.environ.get('CORS_ORIGINS', '*').split(','),
+    allow_origins=parse_cors_origins(),
     allow_methods=["*"],
     allow_headers=["*"],
 )
