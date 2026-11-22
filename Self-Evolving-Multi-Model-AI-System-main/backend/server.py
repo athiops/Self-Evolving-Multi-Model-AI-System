@@ -21,6 +21,7 @@ import threading
 
 # River for online ML
 from river import anomaly, preprocessing, drift
+from federated_aggregation import average_weight_updates
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -286,15 +287,10 @@ class FederatedAggregator:
             
         all_weights = [node.get_weights() for node in self.nodes.values()]
         
-        # Simple averaging (FedAvg)
-        num_nodes = len(all_weights)
-        weight_length = len(all_weights[0])
+        # Equal-client averaging for this simulated demo. This is not
+        # sample-count-weighted FedAvg because nodes do not report sample counts.
+        aggregated = average_weight_updates(all_weights)
         
-        aggregated = []
-        for i in range(weight_length):
-            avg = sum(weights[i] for weights in all_weights) / num_nodes
-            aggregated.append(avg)
-            
         self.global_weights = aggregated
         self.aggregation_rounds += 1
         self.last_aggregation = datetime.now(timezone.utc)
