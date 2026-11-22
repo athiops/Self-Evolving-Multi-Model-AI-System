@@ -38,6 +38,6 @@ def average_weight_updates(updates: Sequence[Sequence[Real]]) -> list[float]:
         validated.append(row)
 
     return [
-        math.fsum(row[column] for row in validated) / len(validated)
+        math.fsum(row[column] / len(validated) for row in validated)
         for column in range(width)
     ]
